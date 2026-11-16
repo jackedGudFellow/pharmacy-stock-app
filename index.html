@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pharmacy Stock App</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#fff}
+*{box-sizing:border-box}
+button,input,select{font-family:inherit}
+
+/* brand gradient: green to purple */
+.g-bg{background-image:linear-gradient(100deg,var(--g1),var(--g2));background-image:linear-gradient(100deg in oklch,var(--g1),var(--g2))}
+.g-text{display:inline-block;background-image:linear-gradient(100deg,var(--g1),var(--g2));background-image:linear-gradient(100deg in oklch,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;border-radius:999px;border:0;font-size:15px;font-weight:700;letter-spacing:-0.005em;cursor:pointer;white-space:nowrap;transition:transform .2s ease,box-shadow .25s ease,filter .2s ease;-webkit-tap-highlight-color:transparent}
+.btn:focus-visible,.nav-item:focus-visible,.chip:focus-visible,.seg-btn:focus-visible,.round:focus-visible,.kpi:focus-visible{outline:3px solid #C4B5FD;outline-offset:2px}
+.btn-fill{color:#fff;background-image:linear-gradient(100deg,var(--g1),var(--g2));background-image:linear-gradient(100deg in oklch,var(--g1),var(--g2));box-shadow:0 10px 24px -12px rgba(109,40,217,.65)}
+.btn-fill:hover{transform:translateY(-1px);filter:saturate(1.1);box-shadow:0 16px 28px -12px rgba(109,40,217,.7)}
+.btn-fill:active{transform:translateY(0)}
+.btn-outline{border:1.5px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(100deg,var(--g1),var(--g2)) border-box;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(100deg in oklch,var(--g1),var(--g2)) border-box}
+.btn-outline:hover{transform:translateY(-1px);box-shadow:0 12px 24px -16px rgba(109,40,217,.6)}
+.btn-outline:active{transform:translateY(0)}
+.btn-outline .lbl{display:inline-block;background-image:linear-gradient(100deg,var(--g1),var(--g2));background-image:linear-gradient(100deg in oklch,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+
+/* navigation with a gliding highlight */
+.nav-item{position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%;height:48px;padding:0 16px;border:0;border-radius:14px;background:transparent;font-size:15px;font-weight:600;color:#5B5873;cursor:pointer;text-align:left;transition:color .25s ease}
+.nav-item:hover{color:#1E1B2E}
+.nav-item.is-active{color:var(--g1)}
+.nav-item.is-active .nav-lbl{display:inline-block;background-image:linear-gradient(100deg,var(--g1),var(--g2));background-image:linear-gradient(100deg in oklch,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.nav-glide{position:absolute;left:0;top:0;width:100%;height:48px;border-radius:14px;background:#F1EEFC;background:linear-gradient(100deg,color-mix(in srgb,var(--g1) 12%,#fff),color-mix(in srgb,var(--g2) 14%,#fff));transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+
+/* surfaces */
+.card{background:#fff;border:1px solid #ECE9F6;border-radius:22px;box-shadow:0 1px 2px rgba(30,27,46,.04),0 18px 40px -26px rgba(76,29,149,.28)}
+.kpi{text-align:left;font:inherit;color:inherit;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 1px 2px rgba(30,27,46,.04),0 24px 44px -24px rgba(76,29,149,.4)}
+.n-amber{color:#B45309}
+.n-rose{color:#BE123C}
+.pill{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.lbl-s{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#5B5873}
+
+/* filter chips and segmented control */
+.chip{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;border:1px solid #DCD8EA;background:#fff;color:#3B3753;font-size:14px;font-weight:600;cursor:pointer;transition:border-color .2s ease,color .2s ease,box-shadow .25s ease}
+.chip:hover{border-color:var(--g2)}
+.chip .count{font-variant-numeric:tabular-nums;opacity:.75}
+.chip.is-on{color:#fff;border-color:transparent;background-image:linear-gradient(100deg,var(--g1),var(--g2));background-image:linear-gradient(100deg in oklch,var(--g1),var(--g2));box-shadow:0 10px 22px -14px rgba(109,40,217,.7)}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:#F3F1FA}
+.seg-btn{height:44px;padding:0 24px;border:0;border-radius:999px;background:transparent;font-size:15px;font-weight:700;color:#5B5873;cursor:pointer;transition:color .25s ease,box-shadow .25s ease}
+.seg-btn.is-on{color:#fff;background-image:linear-gradient(100deg,var(--g1),var(--g2));background-image:linear-gradient(100deg in oklch,var(--g1),var(--g2));box-shadow:0 10px 22px -14px rgba(109,40,217,.7)}
+
+/* form fields */
+.field{width:100%;height:48px;padding:0 14px;border-radius:14px;border:1px solid #DCD8EA;background:#fff;font-size:15px;color:#1E1B2E;transition:border-color .2s ease,box-shadow .2s ease}
+.field:focus{outline:none;border-color:var(--g2);box-shadow:0 0 0 4px rgba(124,58,237,.16)}
+.round{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;border:1.5px solid #DCD8EA;background:#fff;color:#1E1B2E;cursor:pointer;transition:border-color .2s ease,transform .2s ease}
+.round:hover{border-color:var(--g2);transform:translateY(-1px)}
+
+/* ledger rows */
+.inv-head,.inv-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.3fr) minmax(0,1.5fr) minmax(0,1fr) 232px;gap:16px;align-items:center;padding:16px 24px}
+.inv-head{padding-block:12px;border-bottom:1px solid #F0EEF8}
+.inv-row{border-top:1px solid #F0EEF8;transition:background .2s ease}
+.inv-row:first-of-type{border-top:0}
+.inv-row:hover{background:#FAF9FE}
+.inv-actions{display:flex;gap:8px;justify-content:flex-end}
+.delta-in{color:#0B6B4B}
+.delta-out{color:#1E1B2E}
+
+/* smooth page-to-page movement */
+@keyframes pageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+.page-in{display:flex;flex-direction:column;gap:24px}
+.page-in > *{animation:pageIn .55s cubic-bezier(.2,.8,.2,1) both}
+.page-in > *:nth-child(2){animation-delay:.07s}
+.page-in > *:nth-child(3){animation-delay:.14s}
+.page-in > *:nth-child(4){animation-delay:.21s}
+.pop{animation:pop .45s cubic-bezier(.2,.8,.2,1) both}
+
+@media (max-width:980px){
+  .inv-head{display:none}
+  .inv-row{grid-template-columns:minmax(0,1fr);gap:12px;padding:20px}
+  .inv-actions{justify-content:stretch}
+  .inv-actions .btn{flex:1}
+}
+@media (prefers-reduced-motion:reduce){
+  .page-in > *,.pop{animation:none}
+  .nav-glide,.btn,.kpi,.chip,.seg-btn,.round{transition:none}
+}
+</style>
+</helmet>
+
+<div style="--g1: {{green}}; --g2: {{purple}}; min-height: 980px; display: flex; flex-wrap: wrap; align-items: stretch; background: #FFFFFF; color: #1E1B2E; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.45">
+
+  <aside style="flex: 1 1 240px; max-width: 272px; padding: 28px 20px; border-right: 1px solid #ECE9F6; display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 0 8px">
+      <div class="g-bg" style="width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px -12px rgba(109,40,217,.7)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+      </div>
+      <div style="display: flex; flex-direction: column; line-height: 1.15">
+        <span style="font-size: 18px; font-weight: 800; letter-spacing: -0.02em">Pharma Stock</span>
+        <span style="font-size: 12px; color: #5B5873">[Your pharmacy name]</span>
+      </div>
+    </div>
+
+    <nav aria-label="Main" style="position: relative; display: flex; flex-direction: column; gap: 8px">
+      <div class="nav-glide" aria-hidden="true" style="transform: translateY({{navY}}px)"></div>
+      <button class="nav-item {{navDash}}" type="button" onClick="{{goDashboard}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+        <span class="nav-lbl">Dashboard</span>
+      </button>
+      <button class="nav-item {{navInv}}" type="button" onClick="{{goInventory}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"></path><path d="M3 7.5 12 12l9-4.5M12 12v9"></path></svg>
+        <span class="nav-lbl">Inventory</span>
+      </button>
+      <button class="nav-item {{navMoves}}" type="button" onClick="{{goMoves}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4 3 8l4 4"></path><path d="M3 8h13"></path><path d="m17 20 4-4-4-4"></path><path d="M21 16H8"></path></svg>
+        <span class="nav-lbl">Receive &amp; dispense</span>
+      </button>
+      <button class="nav-item {{navAlerts}}" type="button" onClick="{{goAlerts}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>
+        <span class="nav-lbl">Alerts</span>
+      </button>
+    </nav>
+
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: #F7F6FC">
+      <div class="g-bg" style="width: 38px; height: 38px; border-radius: 50%; flex: none"></div>
+      <div style="display: flex; flex-direction: column; line-height: 1.2; min-width: 0">
+        <span style="font-size: 14px; font-weight: 700">[Pharmacist name]</span>
+        <span style="font-size: 12px; color: #5B5873">Pharmacist</span>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 36px clamp(16px, 4vw, 40px) 72px; display: flex; flex-direction: column; gap: 28px">
+
+    <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+        <h1 class="g-text" style="margin: 0; font-size: 36px; font-weight: 800; line-height: 1.2; letter-spacing: -0.025em; text-wrap: balance">{{pageTitle}}</h1>
+        <p style="margin: 0; color: #5B5873; font-size: 15px">{{pageSub}}</p>
+      </div>
+      <button class="btn btn-fill" type="button" onClick="{{goMoves}}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        Add stock
+      </button>
+    </header>
+
+    <!-- DASHBOARD -->
+    <sc-if value="{{isDashboard}}" hint-placeholder-val="{{ true }}">
+      <div class="page-in">
+        <section aria-label="Summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px">
+          <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+            <button class="kpi card" type="button" onClick="{{k.go}}" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 4px">
+              <span class="lbl-s">{{k.label}}</span>
+              <span class="{{k.cls}}" style="font-size: 44px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">{{k.value}}</span>
+              <span style="font-size: 13.5px; color: #5B5873">{{k.cap}}</span>
+            </button>
+          </sc-for>
+        </section>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+          <section class="card" style="flex: 999 1 480px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px">
+              <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.015em">Needs attention</h2>
+              <button class="btn btn-outline" type="button" onClick="{{goAlerts}}"><span class="lbl">View all alerts</span></button>
+            </div>
+            <sc-for list="{{attention}}" as="a" hint-placeholder-count="5">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 14px 0; border-top: 1px solid #F0EEF8">
+                <div style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                  <span style="font-weight: 700; font-size: 15.5px">{{a.name}} <span style="font-weight: 500; color: #5B5873">{{a.strength}}</span></span>
+                  <span style="font-size: 13.5px; color: #5B5873">{{a.note}}</span>
+                </div>
+                <span class="pill" style="background: {{a.pillBg}}; color: {{a.pillFg}}">{{a.pillLabel}}</span>
+                <button class="btn btn-outline" type="button"><span class="lbl">{{a.cta}}</span></button>
+              </div>
+            </sc-for>
+          </section>
+
+          <section class="card" style="flex: 1 1 300px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 4px">
+            <h2 style="margin: 0 0 8px; font-size: 20px; font-weight: 800; letter-spacing: -0.015em">Recent activity</h2>
+            <sc-for list="{{activityShort}}" as="e" hint-placeholder-count="5">
+              <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 2px 12px; padding: 12px 0; border-top: 1px solid #F0EEF8">
+                <span class="{{e.cls}}" style="font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums">{{e.delta}}</span>
+                <span style="font-size: 14.5px; font-weight: 600">{{e.drug}}</span>
+                <span></span>
+                <span style="font-size: 13px; color: #5B5873">{{e.what}} · {{e.when}}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- INVENTORY -->
+    <sc-if value="{{isInventory}}" hint-placeholder-val="{{ false }}">
+      <div class="page-in">
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+          <div style="position: relative; flex: 1 1 260px; min-width: 0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B5873" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 16px; top: 14px"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+            <label for="search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search stock</label>
+            <input id="search" class="field" type="search" placeholder="Search name, strength or batch" autocomplete="off" onInput="{{onSearch}}" style="padding-left: 46px; border-radius: 999px">
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{chips}}" as="c" hint-placeholder-count="4">
+              <button class="chip {{c.cls}}" type="button" onClick="{{c.pick}}">{{c.label}} <span class="count">{{c.count}}</span></button>
+            </sc-for>
+          </div>
+        </div>
+
+        <section class="card" style="padding: 0; overflow: hidden" aria-label="Stock list">
+          <div class="inv-head lbl-s"><span>Drug</span><span>Batch and expiry</span><span>In stock</span><span>Status</span><span></span></div>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+            <div class="inv-row">
+              <div style="min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-weight: 700; font-size: 15.5px; overflow-wrap: anywhere">{{r.name}}</span>
+                <span style="font-size: 13.5px; color: #5B5873">{{r.sub}}</span>
+              </div>
+              <div style="min-width: 0; display: flex; flex-direction: column; gap: 2px; font-variant-numeric: tabular-nums">
+                <span style="font-weight: 600; font-size: 14px">{{r.batch}}</span>
+                <span style="font-size: 13px; color: {{r.expColor}}">{{r.expLine}} · {{r.expNote}}</span>
+              </div>
+              <div style="min-width: 0">
+                <div style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap">
+                  <span style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{r.qtyText}}</span>
+                  <span style="font-size: 13px; color: #5B5873">{{r.unit}}</span>
+                </div>
+                <div aria-hidden="true" style="position: relative; height: 7px; border-radius: 4px; background: #EFEDF7; margin: 9px 0 6px">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{r.barW}}; border-radius: 4px; background: {{r.barBg}}"></div>
+                  <div style="position: absolute; top: -3px; bottom: -3px; width: 2px; left: {{r.tickL}}; background: #1E1B2E; opacity: .65"></div>
+                </div>
+                <span style="font-size: 12.5px; color: #5B5873">{{r.reorderText}}</span>
+              </div>
+              <div><span class="pill" style="background: {{r.pillBg}}; color: {{r.pillFg}}">{{r.pillLabel}}</span></div>
+              <div class="inv-actions">
+                <button class="btn btn-outline" type="button" onClick="{{goMoves}}"><span class="lbl">Receive</span></button>
+                <button class="btn btn-fill" type="button" onClick="{{goMovesOut}}">Dispense</button>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 48px 24px; text-align: center; color: #5B5873">Nothing matches that search. Try a different name or clear the filter.</div>
+          </sc-if>
+        </section>
+      </div>
+    </sc-if>
+
+    <!-- RECEIVE AND DISPENSE -->
+    <sc-if value="{{isMoves}}" hint-placeholder-val="{{ false }}">
+      <div class="page-in">
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+          <section class="card" style="flex: 1 1 460px; min-width: 0; padding: 28px; display: flex; flex-direction: column; gap: 22px">
+            <div class="seg" role="group" aria-label="Stock movement type" style="align-self: flex-start">
+              <button class="seg-btn {{segIn}}" type="button" onClick="{{setIn}}">Receive</button>
+              <button class="seg-btn {{segOut}}" type="button" onClick="{{setOut}}">Dispense</button>
+            </div>
+
+            <sc-if value="{{showForm}}" hint-placeholder-val="{{ true }}">
+              <div class="pop" style="display: flex; flex-direction: column; gap: 18px">
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <label class="lbl-s" for="drug">Drug</label>
+                  <select id="drug" class="field">
+                    <option>Paracetamol 500 mg · tablets</option>
+                    <option>Amoxicillin 500 mg · capsules</option>
+                    <option>Metformin 850 mg · tablets</option>
+                    <option>Omeprazole 20 mg · capsules</option>
+                    <option>Insulin glargine 100 IU/mL · vials</option>
+                    <option>Oral rehydration salts · sachets</option>
+                  </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <span class="lbl-s">Quantity</span>
+                  <div style="display: flex; align-items: center; gap: 14px">
+                    <button class="round" type="button" aria-label="Decrease quantity by 10" onClick="{{dec}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+                    <span class="g-text" style="min-width: 88px; text-align: center; font-size: 40px; font-weight: 800; line-height: 1.2; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">{{qty}}</span>
+                    <button class="round" type="button" aria-label="Increase quantity by 10" onClick="{{inc}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+                  </div>
+                </div>
+
+                <sc-if value="{{isReceive}}" hint-placeholder-val="{{ true }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 16px">
+                    <div style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px">
+                      <label class="lbl-s" for="batch">Batch number</label>
+                      <input id="batch" class="field" type="text" placeholder="PCM-2406" autocomplete="off">
+                    </div>
+                    <div style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px">
+                      <label class="lbl-s" for="expiry">Expiry date</label>
+                      <input id="expiry" class="field" type="date">
+                    </div>
+                  </div>
+                </sc-if>
+
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <label class="lbl-s" for="note">Note (optional)</label>
+                  <input id="note" class="field" type="text" placeholder="{{notePlaceholder}}" autocomplete="off">
+                </div>
+
+                <button class="btn btn-fill" type="button" onClick="{{submit}}" style="height: 52px; font-size: 16px; align-self: stretch">{{submitLabel}}</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+              <div class="pop" style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 28px 8px; text-align: center">
+                <div class="g-bg" style="width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 18px 32px -16px rgba(109,40,217,.7)">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>
+                </div>
+                <h2 class="g-text" style="margin: 0; font-size: 26px; font-weight: 800; line-height: 1.25; letter-spacing: -0.02em">{{doneTitle}}</h2>
+                <p style="margin: 0; color: #5B5873; max-width: 36ch">{{doneSub}}</p>
+                <button class="btn btn-outline" type="button" onClick="{{again}}"><span class="lbl">Record another</span></button>
+              </div>
+            </sc-if>
+          </section>
+
+          <section class="card" style="flex: 1 1 320px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 4px">
+            <h2 style="margin: 0 0 8px; font-size: 20px; font-weight: 800; letter-spacing: -0.015em">Recent movements</h2>
+            <sc-for list="{{activityAll}}" as="e" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 2px 12px; padding: 12px 0; border-top: 1px solid #F0EEF8">
+                <span class="{{e.cls}}" style="font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums">{{e.delta}}</span>
+                <span style="font-size: 14.5px; font-weight: 600">{{e.drug}}</span>
+                <span></span>
+                <span style="font-size: 13px; color: #5B5873">{{e.what}} · {{e.when}}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ALERTS -->
+    <sc-if value="{{isAlerts}}" hint-placeholder-val="{{ false }}">
+      <div class="page-in">
+        <section style="display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.015em">To reorder <span style="font-weight: 600; color: #5B5873">{{reorderCount}}</span></h2>
+          <sc-for list="{{alertsReorder}}" as="a" hint-placeholder-count="3">
+            <div class="card" style="padding: 18px 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px">
+              <div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-weight: 700; font-size: 16px">{{a.name}} <span style="font-weight: 500; color: #5B5873">{{a.strength}}</span></span>
+                <span style="font-size: 14px; color: #5B5873">{{a.detail}}</span>
+              </div>
+              <span class="pill" style="background: {{a.pillBg}}; color: {{a.pillFg}}">{{a.pillLabel}}</span>
+              <button class="btn btn-fill" type="button">Create reorder</button>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.015em">Expiring soon <span style="font-weight: 600; color: #5B5873">{{expiringCount}}</span></h2>
+          <sc-for list="{{alertsExpiring}}" as="a" hint-placeholder-count="2">
+            <div class="card" style="padding: 18px 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px">
+              <div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-weight: 700; font-size: 16px">{{a.name}} <span style="font-weight: 500; color: #5B5873">{{a.strength}}</span></span>
+                <span style="font-size: 14px; color: #5B5873">{{a.detail}}</span>
+              </div>
+              <span class="pill" style="background: {{a.pillBg}}; color: {{a.pillFg}}">{{a.pillLabel}}</span>
+              <button class="btn btn-outline" type="button"><span class="lbl">Dispense first</span></button>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.015em">Expired <span style="font-weight: 600; color: #5B5873">{{expiredCount}}</span></h2>
+          <sc-for list="{{alertsExpired}}" as="a" hint-placeholder-count="1">
+            <div class="card" style="padding: 18px 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px">
+              <div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-weight: 700; font-size: 16px">{{a.name}} <span style="font-weight: 500; color: #5B5873">{{a.strength}}</span></span>
+                <span style="font-size: 14px; color: #5B5873">{{a.detail}}</span>
+              </div>
+              <span class="pill" style="background: {{a.pillBg}}; color: {{a.pillFg}}">{{a.pillLabel}}</span>
+              <button class="btn btn-fill" type="button">Remove from shelf</button>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"green":{"editor":"color","default":"#09845A","section":"Brand gradient"},"purple":{"editor":"color","default":"#7C3AED","section":"Brand gradient"},"$preview":{"width":1280,"height":980}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { page: 'dashboard', filter: 'all', q: '', mode: 'in', qty: 120, done: false };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const ST = {
+      expired:  { label: 'Expired',       bg: '#FFE4E8', fg: '#BE123C', rank: 0, bar: 'linear-gradient(90deg, var(--g1), var(--g2))' },
+      out:      { label: 'Out of stock',  bg: '#FFE4E8', fg: '#BE123C', rank: 1, bar: '#E11D48' },
+      low:      { label: 'Low stock',     bg: '#FEF3C7', fg: '#92400E', rank: 2, bar: '#D97706' },
+      expiring: { label: 'Expiring soon', bg: '#FEF3C7', fg: '#92400E', rank: 3, bar: 'linear-gradient(90deg, var(--g1), var(--g2))' },
+      ok:       { label: 'In stock',      bg: '#E7F8F0', fg: '#0B6B4B', rank: 4, bar: 'linear-gradient(90deg, var(--g1), var(--g2))' }
+    };
+    const fmt = (n) => n.toLocaleString('en-US');
+    const drugs = [
+      { name: 'Paracetamol',        strength: '500 mg',    unit: 'tablets',  batch: 'PCM-2406', exp: '31 May 2028', expNote: 'in 18 months',       qty: 1240, reorder: 400, status: 'ok' },
+      { name: 'Amoxicillin',        strength: '500 mg',    unit: 'capsules', batch: 'AMX-2511', exp: '30 Apr 2027', expNote: 'in 6 months',        qty: 96,   reorder: 200, status: 'low' },
+      { name: 'Metformin',          strength: '850 mg',    unit: 'tablets',  batch: 'MET-2399', exp: '31 Aug 2027', expNote: 'in 10 months',       qty: 0,    reorder: 300, status: 'out' },
+      { name: 'Omeprazole',         strength: '20 mg',     unit: 'capsules', batch: 'OMZ-2408', exp: '20 Jan 2027', expNote: 'in 2 months',        qty: 560,  reorder: 150, status: 'expiring' },
+      { name: 'Salbutamol',         strength: '100 mcg',   unit: 'inhalers', batch: 'SLB-2602', exp: '30 Sep 2026', expNote: 'expired 43 days ago', qty: 14,  reorder: 10,  status: 'expired' },
+      { name: 'Insulin glargine',   strength: '100 IU/mL', unit: 'vials',    batch: 'INS-7731', exp: '15 Mar 2027', expNote: 'in 4 months',        qty: 9,    reorder: 12,  status: 'low' },
+      { name: 'Cetirizine',         strength: '10 mg',     unit: 'tablets',  batch: 'CTZ-2501', exp: '31 Jan 2028', expNote: 'in 14 months',       qty: 320,  reorder: 100, status: 'ok' },
+      { name: 'Oral rehydration salts', strength: '',      unit: 'sachets',  batch: 'ORS-2610', exp: '31 Dec 2026', expNote: 'in 49 days',         qty: 75,   reorder: 60,  status: 'expiring' },
+      { name: 'Ibuprofen',          strength: '400 mg',    unit: 'tablets',  batch: 'IBU-2503', exp: '30 Nov 2027', expNote: 'in 12 months',       qty: 700,  reorder: 250, status: 'ok' },
+      { name: 'Amlodipine',         strength: '5 mg',      unit: 'tablets',  batch: 'AML-2604', exp: '30 Sep 2027', expNote: 'in 11 months',       qty: 410,  reorder: 200, status: 'ok' }
+    ];
+
+    const mk = (d) => {
+      const st = ST[d.status];
+      const max = Math.max(d.reorder * 3, d.qty, 1);
+      const note =
+        d.status === 'expired' || d.status === 'expiring' ? d.exp + ' · ' + d.expNote :
+        d.status === 'out' ? 'None left · reorder at ' + fmt(d.reorder) :
+        d.status === 'low' ? fmt(d.qty) + ' left · reorder at ' + fmt(d.reorder) : '';
+      const detail =
+        d.status === 'out' ? 'None left. Reorder level is ' + fmt(d.reorder) + ' ' + d.unit + '.' :
+        d.status === 'low' ? fmt(d.qty) + ' ' + d.unit + ' left. Reorder level is ' + fmt(d.reorder) + '.' :
+        d.status === 'expiring' ? 'Expires ' + d.exp + ' (' + d.expNote + '). ' + fmt(d.qty) + ' ' + d.unit + ' on hand.' :
+        d.status === 'expired' ? 'Expired ' + d.exp + ' (' + d.expNote + '). ' + fmt(d.qty) + ' ' + d.unit + ' on hand.' : '';
+      return {
+        name: d.name, strength: d.strength, status: d.status,
+        sub: [d.strength, d.unit].filter(Boolean).join(' · '),
+        batch: d.batch, expLine: 'EXP ' + d.exp, expNote: d.expNote,
+        expColor: d.status === 'expired' ? '#BE123C' : (d.status === 'expiring' ? '#92400E' : '#5B5873'),
+        qtyText: fmt(d.qty), unit: d.unit,
+        barW: (d.qty / max * 100) + '%', tickL: (d.reorder / max * 100) + '%', barBg: st.bar,
+        reorderText: 'Reorder at ' + fmt(d.reorder),
+        pillBg: st.bg, pillFg: st.fg, pillLabel: st.label,
+        note: note, detail: detail,
+        cta: d.status === 'expired' ? 'Remove' : (d.status === 'expiring' ? 'Review' : 'Reorder')
+      };
+    };
+    const list = drugs.map(mk).sort((a, b) => ST[a.status].rank - ST[b.status].rank);
+
+    const count = (fn) => list.filter(fn).length;
+    const nRestock = count((r) => r.status === 'out' || r.status === 'low');
+    const nExpiring = count((r) => r.status === 'expiring');
+    const nExpired = count((r) => r.status === 'expired');
+
+    const goPage = (page, filter) => () => this.setState({ page: page, filter: filter || this.state.filter, done: false });
+    const page = s.page;
+
+    // inventory rows
+    let rows = list.filter((r) =>
+      s.filter === 'all' ||
+      (s.filter === 'restock' && (r.status === 'out' || r.status === 'low')) ||
+      (s.filter === 'expiring' && r.status === 'expiring') ||
+      (s.filter === 'expired' && r.status === 'expired'));
+    const q = (s.q || '').trim().toLowerCase();
+    if (q) rows = rows.filter((r) => (r.name + ' ' + r.sub + ' ' + r.batch).toLowerCase().indexOf(q) > -1);
+
+    const chipDefs = [
+      { key: 'all', label: 'All', count: list.length },
+      { key: 'restock', label: 'To reorder', count: nRestock },
+      { key: 'expiring', label: 'Expiring soon', count: nExpiring },
+      { key: 'expired', label: 'Expired', count: nExpired }
+    ];
+    const chips = chipDefs.map((c) => ({
+      label: c.label, count: c.count, cls: s.filter === c.key ? 'is-on' : '',
+      pick: () => this.setState({ filter: c.key })
+    }));
+
+    const kpis = [
+      { label: 'Stock lines',   value: String(list.length), cap: 'batches on the shelf',      cls: 'g-text',  go: goPage('inventory', 'all') },
+      { label: 'To reorder',    value: String(nRestock),    cap: 'at or below reorder level', cls: 'n-amber', go: goPage('inventory', 'restock') },
+      { label: 'Expiring soon', value: String(nExpiring),   cap: 'within 90 days',            cls: 'n-amber', go: goPage('inventory', 'expiring') },
+      { label: 'Expired',       value: String(nExpired),    cap: 'pull from the shelf',       cls: 'n-rose',  go: goPage('inventory', 'expired') }
+    ];
+
+    const acts = [
+      { sign: 'out', n: 180, what: 'Dispensed', drug: 'Metformin 850 mg',        when: '2 hours ago' },
+      { sign: 'out', n: 75,  what: 'Dispensed', drug: 'Oral rehydration salts',  when: '2 hours ago' },
+      { sign: 'out', n: 80,  what: 'Dispensed', drug: 'Paracetamol 500 mg',      when: 'Yesterday' },
+      { sign: 'out', n: 80,  what: 'Dispensed', drug: 'Cetirizine 10 mg',        when: 'Yesterday' },
+      { sign: 'out', n: 154, what: 'Dispensed', drug: 'Amoxicillin 500 mg',      when: '3 days ago' },
+      { sign: 'out', n: 40,  what: 'Dispensed', drug: 'Omeprazole 20 mg',        when: '3 days ago' },
+      { sign: 'in',  n: 150, what: 'Received',  drug: 'Oral rehydration salts',  when: '10 days ago' }
+    ].map((e) => ({
+      delta: (e.sign === 'in' ? '+' : '−') + fmt(e.n), cls: e.sign === 'in' ? 'delta-in' : 'delta-out',
+      what: e.what, drug: e.drug, when: e.when
+    }));
+
+    const titles = {
+      dashboard: ['Stock overview', 'Thursday 12 November 2026 · ' + list.length + ' stock lines, ' + nRestock + ' to reorder'],
+      inventory: ['Inventory', 'Every batch on the shelf, the ones that need you first.'],
+      moves:     ['Receive & dispense', 'Record stock coming in or going out. Every change is logged.'],
+      alerts:    ['Alerts', 'Reorders, expiring batches and expired stock in one place.']
+    };
+    const navIndex = { dashboard: 0, inventory: 1, moves: 2, alerts: 3 }[page];
+    const isIn = s.mode === 'in';
+
+    return {
+      green: this.props.green ?? '#09845A',
+      purple: this.props.purple ?? '#7C3AED',
+
+      navY: navIndex * 56,
+      navDash: page === 'dashboard' ? 'is-active' : '',
+      navInv: page === 'inventory' ? 'is-active' : '',
+      navMoves: page === 'moves' ? 'is-active' : '',
+      navAlerts: page === 'alerts' ? 'is-active' : '',
+      goDashboard: goPage('dashboard'),
+      goInventory: goPage('inventory', 'all'),
+      goMoves: () => this.setState({ page: 'moves', mode: 'in', done: false }),
+      goMovesOut: () => this.setState({ page: 'moves', mode: 'out', done: false }),
+      goAlerts: goPage('alerts'),
+
+      pageTitle: titles[page][0],
+      pageSub: titles[page][1],
+      isDashboard: page === 'dashboard',
+      isInventory: page === 'inventory',
+      isMoves: page === 'moves',
+      isAlerts: page === 'alerts',
+
+      kpis: kpis,
+      attention: list.filter((r) => r.status !== 'ok').slice(0, 5),
+      activityShort: acts.slice(0, 5),
+      activityAll: acts,
+
+      chips: chips,
+      rows: rows,
+      noRows: rows.length === 0,
+      onSearch: (e) => this.setState({ q: e.target.value }),
+
+      segIn: isIn ? 'is-on' : '',
+      segOut: isIn ? '' : 'is-on',
+      setIn: () => this.setState({ mode: 'in', done: false }),
+      setOut: () => this.setState({ mode: 'out', done: false }),
+      isReceive: isIn,
+      showForm: !s.done,
+      done: s.done,
+      qty: fmt(s.qty),
+      inc: () => this.setState({ qty: Math.min(9990, this.state.qty + 10) }),
+      dec: () => this.setState({ qty: Math.max(1, this.state.qty - 10) }),
+      notePlaceholder: isIn ? 'Invoice or supplier' : 'Prescription number',
+      submitLabel: isIn ? 'Receive stock' : 'Dispense stock',
+      submit: () => this.setState({ done: true }),
+      again: () => this.setState({ done: false, qty: 120 }),
+      doneTitle: isIn ? 'Stock received' : 'Stock dispensed',
+      doneSub: fmt(s.qty) + ' units ' + (isIn ? 'added to' : 'taken from') + ' stock and written to the activity log.',
+
+      reorderCount: String(nRestock),
+      expiringCount: String(nExpiring),
+      expiredCount: String(nExpired),
+      alertsReorder: list.filter((r) => r.status === 'out' || r.status === 'low'),
+      alertsExpiring: list.filter((r) => r.status === 'expiring'),
+      alertsExpired: list.filter((r) => r.status === 'expired')
+    };
+  }
+}
+</script>
+</body>
+</html>
